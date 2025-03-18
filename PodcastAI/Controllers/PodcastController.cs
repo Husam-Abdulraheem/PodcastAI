@@ -20,24 +20,29 @@ namespace PodcastAI.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> PodcastDetails(ResponseDTO dto)
+        public async Task<IActionResult> PodcastDetails([FromForm] ResponseDTO dto)
         {
 
-            string? invoicePath = null;
-            if (dto.Audio != null && dto.Audio.Length > 0)
+            string? AudioPath = null;
+            string? ImagePath = null;
+            if (dto.Audio != null && dto.Audio.Length > 0 && dto.Image != null && dto.Image.Length > 0)
             {
-                var result = await _fileService.ProcessReceipt(dto.Audio);
+                var resultAudio = await _fileService.ProcessReceipt(dto.Audio);
+                var resultImage = await _fileService.ProcessReceipt(dto.Image);
 
-                if (!result.Success)
-                    return Ok(new RequestDTO { Message = result.Message });
-                invoicePath = result.Data.ToString();
+
+                if (!resultAudio.Success || !resultImage.Success)
+                    return Ok(new RequestDTO { Data = new { resultAudio , resultImage } });
+                AudioPath = resultAudio.Data.ToString();
+                ImagePath = resultImage.Data.ToString();
             }
                 var podcast = new Podcast
             {
                 Subject = dto.Subject,
                 Content = dto.Content,
                 Size = dto.Size,
-                AudioUrl = invoicePath,
+                AudioUrl = AudioPath,
+                ImageUrl = ImagePath
 
             };
             var data = await _db.podcasts.AddAsync(podcast);

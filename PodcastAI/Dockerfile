@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0-noble AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["PodcastAI/PodcastAI.csproj", "PodcastAI/"]
+COPY PodcastAI/PodcastAI.csproj PodcastAI/
 RUN dotnet restore "./PodcastAI/PodcastAI.csproj"
 COPY . .
 WORKDIR "/src/PodcastAI"

@@ -12,5 +12,6 @@ namespace PodcastAI.Models
         public string? Content { get; set; }
         public string? AudioUrl { get; set; }
         public string? ImageUrl { get; set; }
+        public bool Special { get; set; }
     }
 }

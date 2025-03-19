@@ -41,6 +41,9 @@ namespace PodcastAI.Migrations
                     b.Property<string>("Size")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Special")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 

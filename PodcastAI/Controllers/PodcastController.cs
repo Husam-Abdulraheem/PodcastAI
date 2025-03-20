@@ -20,6 +20,12 @@ namespace PodcastAI.Controllers
             _fileService = fileService;
         }
 
+
+
+
+
+
+
         [HttpPost("podcast-details")]
         public async Task<IActionResult> PodcastDetails([FromForm] ResponseDTO dto)
         {
@@ -27,6 +33,7 @@ namespace PodcastAI.Controllers
                 return BadRequest(new RequestDTO { Message = "Invalid request data." });
 
             string? audioPath = null;
+            string? imagePath = null;
 
             if (dto.Audio != null && dto.Audio.Length > 0)
             {
@@ -35,8 +42,15 @@ namespace PodcastAI.Controllers
                     return BadRequest(new RequestDTO { Message = "Audio upload failed", Data = resultAudio.Message });
                 audioPath = resultAudio.Data?.ToString();
             }
+            if (dto.Image != null && dto.Image.Length > 0)
+            {
+                var resultImage = await _fileService.ProcessFile(dto.Image, new[] { ".jpg", ".png", ".jpeg", ".webp" });
+                if (!resultImage.Success)
+                    return BadRequest(new RequestDTO { Message = "Image upload failed", Data = resultImage.Message });
+                imagePath = resultImage.Data?.ToString();
+            }
 
-           
+
 
             var podcast = new Podcast
             {
@@ -44,7 +58,7 @@ namespace PodcastAI.Controllers
                 Content = dto.Content,
                 Size = dto.Size,
                 AudioUrl = $"https://www.podcastai.somee.com/uploads/{audioPath}",
-                ImageUrl = dto.Image,
+                ImageUrl = $"https://www.podcastai.somee.com/uploads/{imagePath}",
                 Special = false
             };
 
@@ -53,6 +67,13 @@ namespace PodcastAI.Controllers
 
             return Ok(new RequestDTO { Success = true, Message = "Podcast uploaded successfully." });
         }
+
+
+
+
+
+
+
 
 
 
@@ -67,6 +88,13 @@ namespace PodcastAI.Controllers
             return Ok(new RequestDTO { Data = specialPodcast, Success = true });
         }
 
+
+
+
+
+
+
+
         [HttpGet("get-podcasts")]
         public async Task<IActionResult> GetPodcasts()
         {
@@ -78,6 +106,14 @@ namespace PodcastAI.Controllers
             return Ok(new RequestDTO { Data = specialPodcast, Success = true });
         }
 
+
+
+
+
+
+
+
+
         [HttpPost("special-podcast")]
         public async Task<IActionResult> SpecialPodcast([FromForm] ResponseDTO dto)
         {
@@ -85,6 +121,7 @@ namespace PodcastAI.Controllers
                 return BadRequest(new RequestDTO { Message = "Invalid request data." });
 
             string? audioPath = null;
+            string? imagePath = null;
 
             if (dto.Audio != null && dto.Audio.Length > 0)
             {
@@ -94,6 +131,13 @@ namespace PodcastAI.Controllers
                 audioPath = resultAudio.Data?.ToString();
             }
 
+            if (dto.Image != null && dto.Image.Length > 0)
+            {
+                var resultImage = await _fileService.ProcessFile(dto.Image, new[] { ".jpg", ".png", ".jpeg", ".webp" });
+                if (!resultImage.Success)
+                    return BadRequest(new RequestDTO { Message = "Image upload failed", Data = resultImage.Message });
+                imagePath = resultImage.Data?.ToString();
+            }
 
 
             var podcast = new Podcast
@@ -102,7 +146,7 @@ namespace PodcastAI.Controllers
                 Content = dto.Content,
                 Size = dto.Size,
                 AudioUrl = $"https://www.podcastai.somee.com/uploads/{audioPath}",
-                ImageUrl = dto.Image,
+                ImageUrl = $"https://www.podcastai.somee.com/uploads/{imagePath}",
                 Special = true
             };
 
@@ -159,7 +203,7 @@ namespace PodcastAI.Controllers
                     await file.CopyToAsync(fileStream);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new RequestDTO { Success = false, Message = "Failed to save file." };
             }
